@@ -1,0 +1,33 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+    integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZEK6fYwnKQVbOy8mI6U6J6"
+    crossorigin="anonymous">
+
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+
+  <link href="" rel="stylesheet" type="text/css" />
+
+  <title>
+    {% block title %} replace title {% endblock %}
+  </title>
+</head>
+
+<body>
+
+  <div id="page">
+    {% block pageblock%}
+    replace page
+    {% endblock%}
+  </div>
+
+  <div id="footer" style="position: fixed; bottom: 0; width: 100%; text-align: center;">
+    <p>&copy; 2023 University of Surrey</p>
+  </div>
+
+</body>
+
+</html>

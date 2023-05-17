@@ -1,0 +1,14 @@
+<table>
+  <tr>
+      <th>Date</th>
+      <th>Var 95</th>
+      <th>Var 99</th>
+  </tr>
+  {% for date, var95, var99 in data %}
+      <tr>
+          <td>{{ date }}</td>
+          <td>{{ var95 }}</td>
+          <td>{{ var99 }}</td>
+      </tr>
+  {% endfor %}
+</table>

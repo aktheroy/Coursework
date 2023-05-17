@@ -1,0 +1,56 @@
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+<div id="calculator">
+  <h2>asdaaa</h2>
+  <h3>monte carlo cost estimation</h3>
+  <form id="cost-form" method="post" action="/calculate">
+    <div class="form-group">
+      <label for="service-type">Scalable Service:</label>
+      <div class="radio-group">
+        <label>
+          <input type="radio" name="service-type" value="ec2" checked required> EC2
+        </label>
+        <br></br>
+        <label>
+          <input type="radio" name="service-type" value="lambda" required> AWS Lambda
+        </label>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="num-resources">Number of Resources:</label>
+      <input type="number" min="0" name="num-resources" id="num-resources" placeholder="Enter number of resources" class="form-control" required>
+    </div>
+    <div class="form-group">
+      <label for="price-history">Price History (in Days):</label>
+      <input type="number" min="0" name="price-history" id="price-history" placeholder="Enter length of price history" class="form-control" required>
+    </div>
+    <div class="form-group">
+      <label for="data-points">Data Points:</label>
+      <input type="number" min="0" name="data-points" id="data-points" placeholder="Enter number of data points" class="form-control" required>
+    </div>
+    <div class="form-group">
+      <label for="transaction-type">Transaction Type:</label>
+      <div class="btn-group btn-group-toggle" data-toggle="buttons">
+        <label class="btn btn-primary active">
+          <input type="radio" name="transaction-type" id="buy-option" value="buy" autocomplete="off" checked required>Buy
+        </label>
+        <label class="btn btn-primary">
+          <input type="radio" name="transaction-type" id="sell-option" value="sell" autocomplete="off" required>Sell
+        </label>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="profit-days">Days to Check Profit:</label>
+      <input type="number" name="profit-days" id="profit-days" placeholder="Enter number of days to check profit" class="form-control" required>
+    </div>
+    <div class="form-group">
+      <button type="submit" class="btn btn-primary" name="audit">Audit</button>
+      <button type="button" class="btn btn-secondary" name="reset" onclick="window.location='/'; return false;">Reset</button>
+    </div>
+  </form>
+  {% if note %}
+    <h3 style="color: #11FFFF">{{ note }}</h3>
+  {% endif %}
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
