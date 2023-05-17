@@ -1,14 +1,161 @@
-<table>
-  <tr>
-      <th>Date</th>
-      <th>Var 95</th>
-      <th>Var 99</th>
-  </tr>
-  {% for date, var95, var99 in data %}
-      <tr>
-          <td>{{ date }}</td>
-          <td>{{ var95 }}</td>
-          <td>{{ var99 }}</td>
-      </tr>
-  {% endfor %}
-</table>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Result</title>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+    <script type="text/javascript">
+        google.charts.load('current', {'packages':['corechart']});
+        google.charts.setOnLoadCallback(drawChart);
+
+        function drawChart() {
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', 'Date');
+            data.addColumn('number', 'var 95');
+            data.addColumn('number', 'var 99');
+            data.addColumn('number', 'Average var 95');
+            data.addColumn('number', 'Average var 99');
+
+            var table = document.querySelector('table tbody');
+            var sumVar95 = 0;
+            var sumVar99 = 0;
+            var rowCount = 0;
+            for (var i = 0, row; row = table.rows[i]; i++) {
+                var date = row.cells[0].innerText;
+                var var95 = parseFloat(row.cells[1].innerText);
+                var var99 = parseFloat(row.cells[2].innerText);
+
+                sumVar95 += var95;
+                sumVar99 += var99;
+                rowCount++;
+
+                data.addRow([date, var95, var99, sumVar95 / rowCount, sumVar99 / rowCount]);
+            }
+
+            var avgVar95 = sumVar95 / rowCount;
+            var avgVar99 = sumVar99 / rowCount;
+
+            document.querySelector('.Average_value').innerHTML = '<strong>Average Var 95:</strong> ' + avgVar95.toFixed(2) + '<br><strong>Average Var 99:</strong> ' + avgVar99.toFixed(2);
+
+            var options = {
+                title: 'Var 95 and Var 99 over time',
+                curveType: 'function',
+                legend: { position: 'bottom' }
+            };
+
+            var chart95 = new google.visualization.LineChart(document.getElementById('chart-var95'));
+            chart95.draw(data, options);
+        }
+    </script>
+
+    <style>
+         body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+        .container {
+            width: 90%;
+            margin: auto;
+            padding: 20px;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            border: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 15px;
+            text-align: left;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        tr:hover {
+            background-color: #ddd;
+        }
+        th {
+            background-color: #0aa9be;
+            color: white;
+        }
+        .user-input, .Average_value {
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #f2f2f2;
+        }
+        .terminate-button, .audit-button {
+            background-color: #4caf50; /* Green */
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            transition-duration: 0.4s;
+            cursor: pointer;
+            border-radius: 4px;
+            box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+        }
+        .terminate-button {
+            background-color: red; 
+        }
+        .terminate-button:hover, .audit-button:hover {
+            background-color: #45a049;
+            color: white;
+        }
+        .terminate-button:hover {
+            background-color: darkred;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="user-input">
+            <strong>Service Type:</strong> {{ request.form['service-type'] }} |
+            <strong>Number of Resources:</strong> {{ request.form['num-resources'] }} |
+            <strong>Price History:</strong> {{ request.form['price-history'] }} |
+            <strong>Data Points:</strong> {{ request.form['data-points'] }} |
+            <strong>Transaction Type:</strong> {{ request.form['transaction-type'] }} |
+            <strong>Profit Days:</strong> {{ request.form['profit-days'] }}
+        </div>
+        
+        <div id="chart-var95" style="width: 100%; height: 500px"></div>
+
+        <div class="Average_value">
+            <strong>Average Var 95:</strong>
+            <br></br>
+            <strong>Average Var 99:</strong>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>var 95</th>
+                    <th>var 99</th>
+                    <th>Profit/Loss</th>
+                    <th>Change</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for date, var95, var99, Profit_Loss, chane in data %}
+                <tr>
+                    <td>{{ date }}</td>
+                    <td>{{ var95 }}</td>
+                    <td>{{ var99 }}</td>
+                    <td>{{ Profit_Loss }}</td>
+                    <td>{{ chane }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <button class="terminate-button">Terminate</button>
+        <button class="audit-button" onclick="window.location='audit.htm';">Audit</button>
+    </div>
+</body>
+</html>
