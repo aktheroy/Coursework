@@ -1,0 +1,23 @@
+runtime: python39 # replace with your Python version
+entrypoint: python cld.py # replace 'main.py' with your main Python script
+
+instance_class: F2
+
+automatic_scaling:
+  target_cpu_utilization: 0.65
+  min_instances: 1
+  max_instances: 20
+  min_pending_latency: automatic
+  max_pending_latency: 30ms
+
+env_variables:
+  AWS_ACCESS_KEY_ID: 'ASIATGDG72GDXK36VCEU'
+  AWS_SECRET_ACCESS_KEY: 'XMs+POyep+/qWVUfK/r2BMD0/DcRKldOngjJUhEg'
+  AWS_SESSION_TOKEN: 'FwoGZXIvYXdzEMn//////////wEaDGo8M+AFquAlAsnStCLFASUGdcQPYydz3I6E7JI3ai2jw4ojf0WpJw4A2IljHc+nE2qZzitIKR7b7iqlxOe99hg4vH/U2g8nR5B9at05M4WOgUuX3lJBOVHxHTlxBdY2ADS7PYGYQhXlaGEXvsy5Kw6gDHUumn9ryiyDhjdpaw1v7oLAotTOidiWDEXadCqM6uBB+jAZJX6nBPZzE/sebF3iYv0nRVSdq6YwuTOTF4Tw/qMbpWu9c0A8FYnwsntQOCfNeNgx5U/jZo2WZdg9/K6wZyclKLeZtaMGMi2aDTqk053tD+m/LnWIwiMvci9SB/LaRYxx1FANstW4uQeq2SG1ZcJxvOKVaKA='
+  REGION_NAME: 'us-east-1'
+
+
+resources:
+  cpu: 1
+  memory_gb: 1
+  disk_size_gb: 10

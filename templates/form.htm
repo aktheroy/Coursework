@@ -1,121 +1,148 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Monte Carlo Cost Estimation</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-<style>
-body {
-  font-family: 'Poppins', sans-serif;
-  background-color: #f8f9fa;
-  padding: 20px;
-}
-#calculator {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 20px;
-  background-color: #ffffff;
-  border-radius: 10px;
-  box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
-}
-.form-group {
-  margin-bottom: 1.5rem;
-}
-.form-group label {
-  font-weight: 500;
-}
-.btn {
-  border-radius: 5px;
-}
-.warmup-button {
-  background-color: #ff9900;
-  color: #ffffff;
-}
-.btn-buy {
-  background-color: rgba(0, 78, 187, 0.868);
-  color: #ffffff;
-}
-.btn-sell {
-  background-color: rgb(4, 174, 160);
-  color: #ffffff;
-  margin-left: 10px;
-}
-.btn-active {
-  color: #000000; /* Black font color */
-}
-#rest-of-form {
-  display: none;
-}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Monte Carlo Cost Estimation</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #f8f9fa;
+      padding: 20px;
+    }
 
-</style>
+    #calculator {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+      font-weight: 500;
+    }
+
+    .btn {
+      border-radius: 5px;
+    }
+
+    .warmup-button {
+      background-color: #ff9900;
+      color: #ffffff;
+    }
+
+    .btn-buy {
+      background-color: rgba(0, 78, 187, 0.868);
+      color: #ffffff;
+    }
+
+    .btn-sell {
+      background-color: rgb(4, 174, 160);
+      color: #ffffff;
+      margin-left: 10px;
+    }
+
+    .btn-active {
+      color: #000000;
+    }
+
+    #rest-of-form {
+      display: none;
+    }
+  </style>
 </head>
 <body>
 <div id="calculator">
-<h3 class="text-center mb-5">Monte Carlo Cost Estimation</h3>
-<form id="cost-form" method="post" action="/calculate">
-  <div class="form-group">
-    <label for="service-type">Scalable Service:</label>
-    <div class="radio-group">
-      <label>
-        <input type="radio" name="service-type" value="ec2" required> EC2
-      </label>
+  <h3 class="text-center mb-5">Monte Carlo Cost Estimation</h3>
+  <form id="cost-form" method="post" action="/calculate">
+    <div class="form-group">
+      <label for="service-type">Scalable Service:</label>
+      <div class="radio-group">
+        <label>
+          <input type="radio" name="service-type" value="ec2" required> EC2
+        </label>
+        <br></br>
+        <label>
+          <input type="radio" name="service-type" value="lambda" required> AWS Lambda
+        </label>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="num-resources">Number of Resources:</label>
+      <input type="number" min="0" max="17" name="num-resources" id="num-resources" placeholder="Enter number of resources" class="form-control" required>
+    </div>
+    <button type="button" id="initialize-button" class="btn btn-primary">Initialize</button>
+    <div id="rest-of-form">
+      <button type="button" class="warmup-button" style="background-color: rgb(255, 153, 0);" action="warmup">Warm up!</button>
       <br></br>
-      <label>
-        <input type="radio" name="service-type" value="lambda" required> AWS Lambda
-      </label>
+      <div class="form-group">
+        <label for="price-history">Price History (in Days):</label>
+        <input type="number" min="1" name="price-history" id="price-history" placeholder="Enter length of price history" class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label for="data-points">Data Points:</label>
+        <input type="number" min="1" name="data-points" id="data-points" placeholder="Enter number of data points" class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label for="transaction-type">Transaction Type:</label>
+        <div class="btn-group btn-group-toggle" data-toggle="buttons">
+          <label class="btn btn-buy active">
+            <input type="radio" name="transaction-type" value="buy" autocomplete="off" checked required>Buy
+          </label>
+          <label class="btn btn-sell">
+            <input type="radio" name="transaction-type" value="sell" autocomplete="off" required>Sell
+          </label>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="profit-days">Days to Check Profit:</label>
+        <input type="number" min="1" name="profit-days" id="profit-days" placeholder="Enter number of days to check profit" class="form-control" required>
+      </div>
+      <div class="form-group">
+        <button type="submit" class="btn btn-primary" name="audit">Calculate</button>
+        <button type="button" class="btn btn-secondary" name="reset" onclick="window.location='/'; return false;">Reset</button>
+      </div>
     </div>
-  </div>
-  <div class="form-group">
-    <label for="num-resources">Number of Resources:</label>
-    <input type="number" min="0" max="17" name="num-resources" id="num-resources" placeholder="Enter number of resources" class="form-control" required>
-  </div>
-  <button type="button" id="initialize-button" class="btn btn-primary">Initialize</button>
-  <div id="rest-of-form">
-  <button type="button" class="warmup-button" style="background-color: rgb(255, 153, 0);" action="warmup">
-    Warm up!
-  </button>
-  <br></br>
-  <div class="form-group">
-    <label for="price-history">Price History (in Days):</label>
-    <input type="number" min="1" name="price-history" id="price-history" placeholder="Enter length of price history" class="form-control" required>
-  </div>
-  <div class="form-group">
-    <label for="data-points">Data Points:</label>
-    <input type="number" min="1" name="data-points" id="data-points" placeholder="Enter number of data points" class="form-control" required>
-  </div>
-  <div class="form-group">
-    <label for="transaction-type">Transaction Type:</label>
-    <div class="btn-group btn-group-toggle" data-toggle="buttons">
-      <label class="btn btn-buy active">
-        <input type="radio" name="transaction-type" value="buy" autocomplete="off" checked required>Buy
-      </label>
-      <label class="btn btn-sell">
-        <input type="radio" name="transaction-type" value="sell" autocomplete="off" required>Sell
-      </label>
-    </div>
-  </div>
-  <div class="form-group">
-    <label for="profit-days">Days to Check Profit:</label>
-    <input type="number" min="1" name="profit-days" id="profit-days" placeholder="Enter number of days to check profit" class="form-control" required>
-  </div>
-  <div class="form-group">
-    <button type="submit" class="btn btn-primary" name="audit">Calculate</button>
-    <button type="button" class="btn btn-secondary" name="reset" onclick="window.location='/'; return false;">Reset</button>
-  </div>
-</form>
+  </form>
+</div>
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script>
-  $(document).ready(function(){
-    $('.btn-group-toggle .btn').click(function(){
+  $(document).ready(function () {
+    $('.btn-group-toggle .btn').click(function () {
       $('.btn-group-toggle .btn').removeClass('btn-active');
       $(this).addClass('btn-active');
     });
 
-    // Add this to show the rest of the form and hide the initialize button when it's clicked
-    $('#initialize-button').click(function(){
-      if($('input[name="service-type"]:checked').length > 0 && $('#num-resources').val() !== '') {
+    $('.warmup-button').hide();
+
+    $('input[name="service-type"]').change(function () {
+      if ($(this).val() === 'ec2') {
+        $('.warmup-button').show();
+      } else {
+        $('.warmup-button').hide();
+      }
+    });
+
+    $('.warmup-button').click(function () {
+      $.post("/warmup", { 'number_of_resources': $('#num-resources').val() }, function (data, status) {
+        console.log("Data: " + data + "\nStatus: " + status);
+      });
+    });
+
+    if ($('input[name="service-type"]:checked').val() === 'ec2') {
+      $('.warmup-button').show();
+    }
+
+    $('#initialize-button').click(function () {
+      if ($('input[name="service-type"]:checked').length > 0 && $('#num-resources').val() !== '') {
         $('#rest-of-form').show();
         $(this).hide();
       } else {
@@ -127,5 +154,3 @@ body {
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
-
-

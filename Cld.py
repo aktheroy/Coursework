@@ -5,13 +5,14 @@ import boto3
 import botocore
 import yfinance as yf
 from statistics import mean
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect,jsonify
 from pandas_datareader import data as pdr
 from datetime import date, timedelta
 from concurrent.futures import ThreadPoolExecutor
 from io import StringIO
 import pandas as pd
 import numpy as np
+import requests
 
 # Load the credentials
 with open("credentials.txt", "r") as file:
@@ -19,11 +20,14 @@ with open("credentials.txt", "r") as file:
 
 lmbda_client = boto3.client("lambda", aws_access_key_id=aws_access_key_id, aws_secret_access_key=aws_secret_access_key, aws_session_token=aws_session_token, region_name=region_name)
 s3 = boto3.resource("s3", aws_access_key_id=aws_access_key_id, aws_secret_access_key=aws_secret_access_key, aws_session_token=aws_session_token, region_name=region_name)
+ec_2 = boto3.resource("ec2", aws_access_key_id=aws_access_key_id, aws_secret_access_key=aws_secret_access_key, aws_session_token=aws_session_token, region_name=region_name)
 
 # Override yfinance with pandas
 yf.pdr_override()
 
 app = Flask(__name__)
+ec2_urls = []
+instance_id =[]
 
 
 def get_stock_data():
@@ -49,7 +53,7 @@ def home():
     return render_template('index.htm')
 
 
-@app.route("/calculate", methods=['POST'])
+@app.route("/calculate", methods=['POST', 'GET'])
 def calculate():
     # start the timer
     start_time = time.time()
@@ -62,7 +66,6 @@ def calculate():
     profit_days = request.form.get('profit-days')
 
     runs = range(int(numbers_resources))
-
     # Define start and end dates for retrieving historical data
     today = date.today()
     decade_ago = today - timedelta(days=1095)
@@ -122,6 +125,9 @@ def calculate():
 
     json_data = js.dumps(input_dict)
     print(json_data)
+
+    if service_type == "ec2":
+        invoke_ec2(json_data, [f'http://{i}/helloapache.py' for i in ec2_urls])
 
     # Define the Lambda function name and payload
     function_name = 'cloud_computing'
@@ -206,6 +212,8 @@ def calculate():
     # Calculate total cost
     total_cost = cost_per_second * elapsed_time
 
+    #aws data 
+
     print("#########################################################################",total_cost)
 
 
@@ -268,6 +276,23 @@ def calculate():
     print("xxxxxxxxxxxxxxxxxx----------------------xxxxxxxxxxxxxxxxxxx----------xxxxxxxxx", "\n",csv_data)
 
     return render_template("result.htm", data=raw_data,elapsed_time = elapsed_time,total_change=total_change)
+
+def invoke_ec2(payload, urls=["http://ec2-54-84-13-180.compute-1.amazonaws.com/helloapache.py"]):
+    
+    data = []
+    
+    for url in urls:
+        response = requests.post(url,
+                                data = payload)
+        
+        print("£££££££££££££££££££££££££££££££££££££££££££")
+        
+        print(response.content)
+        data.append(eval(response.content))
+
+
+
+    return data
 
 
 @app.route("/audit")
@@ -338,6 +363,33 @@ def reset():
 
     return redirect("/")
 
+
+
+@app.route("/warmup", methods=['POST'])
+def EC2():
+    numbers_resources = int(request.form.get('number_of_resources'))
+
+    # Create the EC2 instance
+    instances = ec_2.create_instances(
+        ImageId='ami-0554b0c22f2e34c67',  # replace with your AMI ID
+        MinCount=numbers_resources,
+        MaxCount= numbers_resources,
+        InstanceType='t2.micro',
+        SecurityGroupIds=['sg-0137c6e26c08f62de'],  # replace with your security group ID
+    )
+
+    for instance in instances:
+        instance.wait_until_running()
+        instance.reload()
+        ec2_urls.append(instance.public_dns_name)
+
+    print(ec2_urls)
+
+@app.route("/terminate-button", methods=['POST'])
+def terminate_ec2():
+    ec_2.instances.filter(InstanceIds=instance_id).terminate()
+
+    return jsonify({'status': 'success'}), 200
 
 
 
